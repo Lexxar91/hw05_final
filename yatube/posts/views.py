@@ -45,7 +45,7 @@ def profile(request, username):
         following = Follow.objects.filter(
             author=author,
             user=request.user).exists()
-    
+
     context = {
         'author': author,
         'posts_sum': author.posts.count(),
@@ -126,9 +126,10 @@ def follow_index(request):
     paginator = Paginator(post_list, settings.PAG_VAL)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {'posts': post_list, 'page_obj': page_obj}
     return render(request, 'posts/follow.html', context)
+
 
 @login_required
 def profile_follow(request, username):
