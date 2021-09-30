@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
-{% block title %} Записи сообщества {% endblock %}
-{% block header %}{{ group.title }}{% endblock %}
+{% block title %} {{group.title}} {% endblock %}
+{% block header %}{{ group }}{% endblock %}
 {% block content %}
   <p>{{ group.description }}</p>
   {% for post in page_obj %}
