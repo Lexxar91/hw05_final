@@ -230,7 +230,9 @@ class PostViewTest(TestCase):
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={
                     'post_id': self.post.id
-            }))
+                    }
+                    )
+        )
         first_object = response.context['post'].comments
         self.assertEqual(first_object, self.post.comments)
 

@@ -87,7 +87,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ('-created',)
         verbose_name = 'Комментарий'
-        
+
     def __str__(self):
         return self.text[:15]
 
@@ -107,14 +107,14 @@ class Follow(models.Model):
         verbose_name='Автор постов',
         help_text='Автор'
     )
-    
+
     class Meta:
         verbose_name = 'Подписки'
         models.UniqueConstraint(
             fields=['user', 'aurhor'],
             name='unique_follow'
-    )
-    
+        )
+
     def __str__(self):
         return (f'{self.user.username} подписывается на автора '
                 f'{self.author.username}')
