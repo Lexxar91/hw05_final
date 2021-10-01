@@ -25,7 +25,7 @@ class TestUrls(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='Testman')
+        self.user2 = User.objects.create_user(username='Testman')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.author_client = Client()
@@ -35,13 +35,16 @@ class TestUrls(TestCase):
         """Тест страниц для гостя"""
         _http_status = 302
         urls = {
-            '/': HTTPStatus.OK.value,
+            '/': HTTPStatus.OK,
             f'/group/{self.group.slug}/': HTTPStatus.OK,
             f'/profile/{self.user}/': HTTPStatus.OK,
             f'/posts/{self.post.id}/': HTTPStatus.OK,
             '/posts/create/': HTTPStatus.NOT_FOUND,
             f'/posts/{self.post.id}/edit/': _http_status,
-            '/unexisting_page/': HTTPStatus.NOT_FOUND
+            '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            f'posts/{self.post.id}/comment': HTTPStatus.NOT_FOUND,
+            f'profile/{self.user2}/follow': HTTPStatus.NOT_FOUND,
+            f'profile/{self.user2}/unfollow': HTTPStatus.NOT_FOUND
         }
         for url, status_code in urls.items():
             with self.subTest(url=url):
@@ -71,3 +74,16 @@ class TestUrls(TestCase):
     def test_post_edit_for_author(self):
         response = self.author_client.get(f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_follow(self):
+        response = self.authorized_client.get(f'/profile/{self.user2}/follow/')
+        self.assertRedirects(
+            response, f'/profile/{self.user2}/'
+        )
+
+    def test_unfollow(self):
+        response = self.authorized_client.get(
+            f'/profile/{self.user2}/unfollow/')
+        self.assertRedirects(
+            response, f'/profile/{self.user2}/'
+        )

@@ -59,7 +59,7 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     posts_count = post.author.posts.count()
     form = CommentForm(request.POST or None)
-    comments = Comment.objects.filter(post_id=post.id)
+    comments = post.comments.filter(post_id=post.id)
     context = {
         'post': post,
         'comments': comments,
@@ -122,7 +122,7 @@ def add_comment(request, post_id):
 def follow_index(request):
     user = request.user
     post_list = Post.objects.filter(
-        author__following__user=user).order_by('-pub_date')
+        author__following__user=user)
     paginator = Paginator(post_list, settings.PAG_VAL)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -144,5 +144,7 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
-    Follow.objects.filter(user=user, author=author).delete()
+    unfollow = Follow.objects.filter(user=user, author=author)
+    if unfollow.exists():
+        unfollow.delete()
     return redirect('posts:profile', username=(author.username))

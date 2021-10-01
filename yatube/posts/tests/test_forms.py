@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..forms import PostForm
-from ..models import Group, Post, User
+from ..forms import PostForm, CommentForm
+from ..models import Group, Post, User, Comment
 
 User = get_user_model()
 
@@ -24,6 +24,7 @@ class TestForm(TestCase):
             group=cls.group,
         )
         cls.forms = PostForm()
+        cls.form_comment = CommentForm()
 
     def setUp(self):
         self.guest_client = Client()
@@ -69,5 +70,32 @@ class TestForm(TestCase):
                 text='Текст для проверки изменения поста',
                 group=self.group.id,
                 author=self.user
+            ).exists()
+        )
+
+    def test_create_comment(self):
+        comment_count = Comment.objects.count()
+        form_data_for_comment = {
+            'text': 'Тестовый текст',
+            'author': TestForm.user,
+        }
+
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', args=[
+                TestForm.post.id]),
+            data=form_data_for_comment,
+            follow=True
+        )
+
+        self.assertRedirects(response, reverse(
+            'posts:post_detail',
+            args=[
+                TestForm.post.id])
+        )
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertTrue(
+            Comment.objects.filter(
+                text='Тестовый текст',
+                author=TestForm.user,
             ).exists()
         )

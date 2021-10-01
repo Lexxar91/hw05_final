@@ -53,6 +53,11 @@ class PostViewTest(TestCase):
             group=cls.group,
             image=cls.uploaded
         )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text='текст',
+        )
 
     def setUp(self):
         self.authorized_client = Client()
@@ -222,12 +227,12 @@ class PostViewTest(TestCase):
 
     def test_create_new_comment(self):
         """Тест создания нового комментария"""
-        comment_count = Comment.objects.count()
         response = self.authorized_client.get(
-            reverse('posts:post_detail',
-                    kwargs={'post_id': PostViewTest.post.id})
-        )
-        self.assertEqual(len(response.context['comments']), comment_count)
+            reverse('posts:post_detail', kwargs={
+                    'post_id': self.post.id
+            }))
+        first_object = response.context['post'].comments
+        self.assertEqual(first_object, self.post.comments)
 
     def test_cache_index(self):
         """Тест кэша"""
