@@ -11,17 +11,17 @@ class Group(models.Model):
         verbose_name='Название группы',
         help_text=(
             'Группа в которой можно'
-            'опубликовать пост'
+            'опубликовать пост',
         )
     )
     slug = models.SlugField(
         unique=True,
         verbose_name='Сылочка',
-        help_text='Кусок урла'
+        help_text='Кусок урла',
     )
     description = models.TextField(
         verbose_name='Описание',
-        help_text='Описание группы'
+        help_text='Описание группы',
     )
 
     def __str__(self):
@@ -31,13 +31,20 @@ class Group(models.Model):
 class Post(models.Model):
     text = models.TextField(
         verbose_name='Текст',
-        help_text='Текст для публикации'
+        help_text='Текст для публикации',
     )
-    pub_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+        verbose_name='Дата добавления',
+        help_text='Дата',
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts'
+        related_name='posts',
+        help_text='Автор',
+        verbose_name='Автор',
     )
     group = models.ForeignKey(
         Group,
@@ -45,11 +52,14 @@ class Post(models.Model):
         blank=True,
         null=True,
         related_name='posts',
+        verbose_name='Группа',
+        help_text='Группа',
     )
     image = models.ImageField(
-        'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        verbose_name='Картинка',
+        help_text='Картинка',
     )
 
     class Meta:
@@ -72,21 +82,21 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор',
-        help_text='Автор'
+        help_text='Автор',
     )
-    text = models.TextField(verbose_name='Текст комментария',
-                            help_text='Поле для комментария'
-                            )
-
+    text = models.TextField(
+        verbose_name='Текст комментария',
+        help_text='Поле для комментария',
+    )
     created = models.DateTimeField(
         verbose_name='Дата публикации',
         auto_now_add=True,
-        help_text='Дата публикации'
+        help_text='Дата публикации',
     )
 
     class Meta:
         ordering = ('-created',)
-        verbose_name = 'Комментарий'
+        verbose_name = 'Комментарий',
 
     def __str__(self):
         return self.text[:15]
@@ -98,21 +108,21 @@ class Follow(models.Model):
         related_name='follower',
         on_delete=models.CASCADE,
         verbose_name='Подписчик',
-        help_text='Пользователь'
+        help_text='Пользователь',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор постов',
-        help_text='Автор'
+        help_text='Автор',
     )
 
     class Meta:
-        verbose_name = 'Подписки'
+        verbose_name = 'Подписки',
         models.UniqueConstraint(
-            fields=['user', 'aurhor'],
-            name='unique_follow'
+            fields=('user', 'aurhor',),
+            name='unique_follow',
         )
 
     def __str__(self):
